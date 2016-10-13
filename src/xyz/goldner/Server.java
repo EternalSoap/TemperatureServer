@@ -9,7 +9,7 @@ import java.net.Socket;
  */
 public class Server implements Runnable {
 
-    protected int serverPort = 8080;
+    protected int serverPort = 8081;
     protected ServerSocket serverSocket = null;
     protected boolean isRunning = false;
     protected Thread serverThread = null;

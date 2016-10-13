@@ -11,7 +11,7 @@ import java.net.Socket;
 public class ServerWorker implements Runnable {
 
     protected Socket clientSocket = null;
-    protected int packetSize = (2*1024);
+    //protected int packetSize = (2*1024);
 
 
     public ServerWorker(Socket clientSocket) {
@@ -32,6 +32,8 @@ public class ServerWorker implements Runnable {
             String text = "";
 
             text = in.readLine();
+
+            //ovo bi trebalo radit, al jedino radi ako tog nema
             /*
             while ((line = in.readLine()) != null) {
                 text +=line;
