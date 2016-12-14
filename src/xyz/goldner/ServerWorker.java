@@ -19,25 +19,19 @@ import java.util.Date;
 public class ServerWorker implements Runnable {
 
     private boolean debug = true;
-
-
-    /*--------------------------DB STUFF----------------------------------------------------------*/
-    private String username = "fran";
-    private String password = "FG5665DB";
-    private String connectionString ="jdbc:mariadb://localhost:3306/fran";
-
+    private Connection connection;
     private String tableName = "testTemps";
-    /*--------------------------------------------------------------------------------------------*/
+
 
 
     protected Socket clientSocket = null;
     //protected int packetSize = (2*1024);
 
 
-    public ServerWorker(Socket clientSocket) {
+    public ServerWorker(Socket clientSocket, Connection connection) {
 
         this.clientSocket = clientSocket;
-
+        this.connection = connection;
 
     }
 
@@ -92,24 +86,19 @@ public class ServerWorker implements Runnable {
                 // in case loading the driver fails
                 /*
 
-
                 try {
                     Class.forName("org.mariadb.jdbc.Driver");
                 } catch (ClassNotFoundException e) {
                     e.printStackTrace();
                 }
                 debugOutput("Driver loaded");
+
                 */
 
 
                 try {
-
-                    Connection connection = DriverManager.getConnection(connectionString,username,password);
                     Statement statement = connection.createStatement();
-                    statement.execute("insert into "+tableName+ " values ('"+array[1]+"' , '"+array[0]+"' )");
-                    statement.close();
-                    connection.close();
-
+                    statement.execute("insert into " + tableName + " values (" + array[1]+ " , " + array[0]+ " )");
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }

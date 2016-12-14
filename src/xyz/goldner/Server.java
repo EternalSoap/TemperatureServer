@@ -5,6 +5,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
 import java.sql.ClientInfoStatus;
+import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.ConcurrentModificationException;
 
@@ -18,10 +19,17 @@ public class Server implements Runnable {
     protected static boolean isRunning = false;
     protected Thread serverThread = null;
     protected static ArrayList<Thread> threadPool = new ArrayList<>();
+    protected static Connection connection;
+    protected static Database db;
+
+
+
 
     public Server()
     {
         this.isRunning = true;
+
+        connection = dbConnect();
 
     }
 
@@ -29,6 +37,7 @@ public class Server implements Runnable {
     {
         this.serverPort = port;
         this.isRunning = true;
+        connection = dbConnect();
     }
 
     @Override
@@ -48,7 +57,9 @@ public class Server implements Runnable {
                 clientSocket = this.serverSocket.accept();
             }catch (IOException e){e.printStackTrace();}
 
-            Thread newConnection = new Thread(new ServerWorker(clientSocket));
+
+
+            Thread newConnection = new Thread(new ServerWorker(clientSocket,connection));
             threadPool.add(newConnection);
             newConnection.start();
 
@@ -62,6 +73,7 @@ public class Server implements Runnable {
     {
 
         isRunning = false;
+        dbDisconnect();
 
 
 
@@ -83,4 +95,18 @@ public class Server implements Runnable {
     public boolean isRunning() {
         return this.isRunning;
     }
+
+    private Connection dbConnect(){
+
+        db = new Database();
+        return db.getConnection();
+
+    }
+
+    private static void dbDisconnect(){
+
+        db.disconnect();
+
+    }
+
 }
