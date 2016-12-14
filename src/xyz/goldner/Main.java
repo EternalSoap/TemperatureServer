@@ -2,9 +2,12 @@ package xyz.goldner;
 
 public class Main {
 
+
+    public static Server server;
+
     public static void main(String[] args) {
 
-        Server server;
+
         if(args.length !=0)
         {
             server = new Server(Integer.parseInt(args[0]));
@@ -21,4 +24,21 @@ public class Main {
 
 
     }
+
+    public static void kill(){
+
+        if(server.isRunning() == false){
+            try {
+                server.serverThread.join();
+            }catch(Exception e){
+                e.printStackTrace();
+            }
+
+        }
+        System.exit(0);
+
+
+
+    }
+
 }

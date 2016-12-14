@@ -3,6 +3,10 @@ package xyz.goldner;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketException;
+import java.sql.ClientInfoStatus;
+import java.util.ArrayList;
+import java.util.ConcurrentModificationException;
 
 /**
  * Created by frang on 30-Sep-16.
@@ -10,13 +14,15 @@ import java.net.Socket;
 public class Server implements Runnable {
 
     protected int serverPort = 8081;
-    protected ServerSocket serverSocket = null;
-    protected boolean isRunning = false;
+    protected static ServerSocket serverSocket = null;
+    protected static boolean isRunning = false;
     protected Thread serverThread = null;
+    protected static ArrayList<Thread> threadPool = new ArrayList<>();
 
     public Server()
     {
         this.isRunning = true;
+
     }
 
     public Server(int port)
@@ -32,8 +38,9 @@ public class Server implements Runnable {
         {
             this.serverThread = Thread.currentThread();
         }
+
         createServerSocket();
-        while(isRunning())
+        while(isRunning() == true)
         {
             Socket clientSocket = null;
             try
@@ -41,21 +48,24 @@ public class Server implements Runnable {
                 clientSocket = this.serverSocket.accept();
             }catch (IOException e){e.printStackTrace();}
 
-            new Thread(new ServerWorker(clientSocket)).start();
+            Thread newConnection = new Thread(new ServerWorker(clientSocket));
+            threadPool.add(newConnection);
+            newConnection.start();
+
+
 
         }
 
     }
 
-    public synchronized void stop()
+    public static synchronized void stop()
     {
-        this.isRunning = false;
-        try
-        {
-            this.serverSocket.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+
+        isRunning = false;
+
+
+
+        Main.kill();
     }
 
 

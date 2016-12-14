@@ -1,3 +1,4 @@
 Manifest-Version: 1.0
 Main-Class: xyz.goldner.Main
+Class-Path: mariadb-java-client-1.5.5.jar
 
