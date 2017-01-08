@@ -3,11 +3,10 @@ package xyz.goldner;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.net.SocketException;
-import java.sql.ClientInfoStatus;
 import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.ConcurrentModificationException;
 
 /**
  * Created by frang on 30-Sep-16.
@@ -21,6 +20,10 @@ public class Server implements Runnable {
     protected static ArrayList<Thread> threadPool = new ArrayList<>();
     protected static Connection connection;
     protected static Database db;
+
+    /** DEBUG STUFF **/
+    private static final boolean truncateData = true;
+    private static final String[] truncateQuery = {"Truncate Mjerenje", "Truncate Mjerenje_old", "Truncate testTemps"};
 
 
 
@@ -68,11 +71,27 @@ public class Server implements Runnable {
         }
 
     }
+    /*
+    stops the server and clears some of the bigger tables so it's more manageable
+     */
 
     public static synchronized void stop()
     {
 
         isRunning = false;
+        if(truncateData == true) {
+            try {
+                Statement trucStatement = connection.createStatement();
+                for (String query: truncateQuery
+                     ) {
+                    trucStatement.execute(query);
+                }
+
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+
         dbDisconnect();
 
 

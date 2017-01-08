@@ -4,10 +4,7 @@ package xyz.goldner;
 
 import java.io.*;
 import java.net.Socket;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ConcurrentModificationException;
@@ -18,14 +15,19 @@ import java.util.Date;
  */
 public class ServerWorker implements Runnable {
 
-    private boolean debug = true;
+    /* debug stuff */
+    private static final boolean debug = true;
+
+
+
+
     private Connection connection;
-    private String tableName = "testTemps";
+    private static final String insertQuery = "insert into Mjerenje values (default,?,?,?)";
 
 
 
     protected Socket clientSocket = null;
-    //protected int packetSize = (2*1024);
+
 
 
     public ServerWorker(Socket clientSocket, Connection connection) {
@@ -38,7 +40,12 @@ public class ServerWorker implements Runnable {
     @Override
     public void run() {
 
+        double temperature = 0.0;
+
+
         try {
+
+
             PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
 
 
@@ -52,6 +59,7 @@ public class ServerWorker implements Runnable {
 
             // this should work but it doesn't
             // it could work now cause the message has \r\n
+            // kinda doesn't matter since the message is always an one liner
             /*
             while ((line = in.readLine()) != null) {
                 text +=line;
@@ -67,6 +75,10 @@ public class ServerWorker implements Runnable {
 
             debugOutput(text);
 
+            /* send "kill" to kill the server
+               waits for all the workers to finish first
+             */
+
             if(text.equals("kill")){
                 debugOutput("Trying to kill");
 
@@ -79,8 +91,7 @@ public class ServerWorker implements Runnable {
                 if(array.length != 1){
                     debugOutput("ChipID "+ array[1] + " Temp " + array[0]);
                     out.println("Ovo bi trebao bit temp " + array[0]);
-
-
+                    temperature = Double.parseDouble(array[0]);
                 }
 
                 // in case loading the driver fails
@@ -96,15 +107,40 @@ public class ServerWorker implements Runnable {
                 */
 
 
+                /*
+
+
                 try {
                     Statement statement = connection.createStatement();
                     statement.execute("insert into " + tableName + " values (" + array[1]+ " , " + array[0]+ " )");
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }
+                */
 
 
-                // writing to text file, will be replaced with db stuff soonish
+
+                Sensor sensor = new Sensor(Integer.parseInt(array[1]),connection);
+                debugOutput("Status " + sensor.getStatus());
+                //sensor.setLocation(1);
+                debugOutput("New status " + sensor.getStatus());
+                if(sensor.getStatus() >0){ // if room is set, write to database
+
+                    PreparedStatement preparedStatement = connection.prepareStatement(insertQuery);
+
+                    preparedStatement.setInt(1,sensor.getLocation());
+                    java.sql.Timestamp date = new java.sql.Timestamp(new java.util.Date().getTime());
+                    preparedStatement.setTimestamp(2,date);
+                    preparedStatement.setDouble(3,temperature);
+
+                    preparedStatement.execute();
+
+
+                }
+
+                sensor = null;
+
+                // writing to html file to check in browser debug use mostly ))
                 try {
                     PrintWriter writer = new PrintWriter("/var/www/html/java/temps.html", "UTF-8");
                     DateFormat df = new SimpleDateFormat("dd/MM/yy HH:mm:ss");
@@ -127,6 +163,8 @@ public class ServerWorker implements Runnable {
 
         } catch (IOException e) {
             e.printStackTrace();
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
 
     }
@@ -140,5 +178,7 @@ public class ServerWorker implements Runnable {
             System.out.println(text);
         }
     }
+
+
 
 }

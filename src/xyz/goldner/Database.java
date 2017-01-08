@@ -4,6 +4,7 @@ import javax.xml.crypto.Data;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.sql.Statement;
 
 /**
  * Created by fran on 14.12.16..
@@ -47,6 +48,8 @@ public class Database {
         }
 
     }
+
+
 
 
 
