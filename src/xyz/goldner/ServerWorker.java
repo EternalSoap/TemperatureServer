@@ -9,6 +9,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ConcurrentModificationException;
 import java.util.Date;
+import java.util.Random;
 
 /**
  * Created by frang on 30-Sep-16.
@@ -41,6 +42,7 @@ public class ServerWorker implements Runnable {
     public void run() {
 
         double temperature = 0.0;
+
 
 
         try {
@@ -84,14 +86,26 @@ public class ServerWorker implements Runnable {
 
                 Server.stop();
 
-            }else {
+            }else if(text.contains(":")){ // only try to split if the ":" is actually in the string
 
 
                 String[] array = text.split(":");
                 if(array.length != 1){
                     debugOutput("ChipID "+ array[1] + " Temp " + array[0]);
-                    out.println("Ovo bi trebao bit temp " + array[0]);
+
+
+                    Random r = new Random();
+
+                    boolean random = r.nextBoolean();
+                    debugOutput("" + random);
+
+                    out.println(random==true?1:0);
+
                     temperature = Double.parseDouble(array[0]);
+                }else{
+
+                    return;
+
                 }
 
                 // in case loading the driver fails
