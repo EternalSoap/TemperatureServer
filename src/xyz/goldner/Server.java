@@ -25,7 +25,7 @@ public class Server implements Runnable {
     protected static Database db;
 
     /** DEBUG STUFF **/
-    private static final boolean truncateData = true;
+    private static final boolean truncateData = false;
     private static final String[] truncateQuery = {"Truncate Mjerenje", "Truncate Mjerenje_old", "Truncate testTemps"};
 
 
@@ -72,6 +72,8 @@ public class Server implements Runnable {
             ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
             HeatingChecker heatingChecker = new HeatingChecker();
 
+
+            //checks if the heating should be turned on every 5 minutes
             executorService.scheduleAtFixedRate(heatingChecker,0,5, TimeUnit.MINUTES);
 
 

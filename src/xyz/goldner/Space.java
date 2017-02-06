@@ -34,11 +34,10 @@ public class Space {
     public int getSpaceID() {return this.spaceID;}
 
 
-    private void getAverageTemp(){
-
+    private void getAverageTemp(){ // gets the average temp in the last 10 minutes for all the rooms in the space
         Database database = new Database();
         Connection connection = database.getConnection();
-        String getAverageTempQuery = "select AVG(T.temperatura) from (select DISTINCT Soba.sobaID,Mjerenje.temperatura from Soba join Mjerenje on Soba.sobaID = Mjerenje.sobaID where Soba.prostorID = ? group by 1) T";
+        String getAverageTempQuery = "select avg(Q.temperatura) from (select * from (select Mjerenje.mjerenjeID,Mjerenje.temperatura,Soba.sobaID from Soba join Mjerenje on Soba.sobaID = Mjerenje.sobaID where Soba.prostorID = ?) as MT order by 1 desc limit 10) as Q";
 
         try {
             PreparedStatement ps = connection.prepareStatement(getAverageTempQuery);
@@ -52,7 +51,6 @@ public class Space {
 
             }
 
-            System.out.println(this.averageTemp);
 
             database.disconnect();
         } catch (SQLException e) {
