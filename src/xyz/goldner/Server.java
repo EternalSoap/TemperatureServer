@@ -7,6 +7,9 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by frang on 30-Sep-16.
@@ -65,6 +68,11 @@ public class Server implements Runnable {
             Thread newConnection = new Thread(new ServerWorker(clientSocket,connection));
             threadPool.add(newConnection);
             newConnection.start();
+
+            ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
+            HeatingChecker heatingChecker = new HeatingChecker();
+
+            executorService.scheduleAtFixedRate(heatingChecker,0,5, TimeUnit.MINUTES);
 
 
 
