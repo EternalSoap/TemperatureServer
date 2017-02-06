@@ -15,6 +15,8 @@ import java.util.ArrayList;
  */
 public class HeatingChecker implements Runnable{
 
+    private boolean debug = true;
+
     
     private ArrayList<Space> arrayListSpace = new ArrayList<>();
 
@@ -61,6 +63,11 @@ public class HeatingChecker implements Runnable{
             e.printStackTrace();
         }
 
+        return;
 
     }
+
+
 }
+
+

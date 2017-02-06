@@ -69,12 +69,7 @@ public class Server implements Runnable {
             threadPool.add(newConnection);
             newConnection.start();
 
-            ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
-            HeatingChecker heatingChecker = new HeatingChecker();
 
-
-            //checks if the heating should be turned on every 5 minutes
-            executorService.scheduleAtFixedRate(heatingChecker,0,5, TimeUnit.MINUTES);
 
 
 

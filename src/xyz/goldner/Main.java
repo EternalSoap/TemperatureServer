@@ -1,5 +1,9 @@
 package xyz.goldner;
 
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+
 public class Main {
 
 
@@ -21,6 +25,13 @@ public class Main {
 
         }
         new Thread(server).start();
+
+        ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
+        HeatingChecker heatingChecker = new HeatingChecker();
+
+
+        //checks if the heating should be turned on every 5 minutes
+        executorService.scheduleAtFixedRate(heatingChecker,1,5, TimeUnit.MINUTES);
 
 
     }

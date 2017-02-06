@@ -9,6 +9,8 @@ import java.time.LocalDateTime;
  */
 public class Space {
 
+    private boolean debug = true;
+
     private int spaceID;
     private float averageTemp; // average temp of all the rooms in the space
     private int currentDesiredTemp; // user selected temperature for the space (schedule or manual)
@@ -23,6 +25,9 @@ public class Space {
         // if the manual temp is not set (value is 0) get it from a valid schedule for the space
         // value is 20 by default if not set manually or by using a schedule
         this.currentDesiredTemp = (this.getManualTemp()!=0?this.getManualTemp():(this.getValidScheduleTemps() !=0?this.getValidScheduleTemps():defaultTemp));
+
+        debugOutput(""+this.averageTemp);
+        debugOutput(""+this.currentDesiredTemp);
 
     }
 
@@ -50,6 +55,7 @@ public class Space {
                 this.averageTemp = rs.getFloat(1);
 
             }
+
 
 
             database.disconnect();
@@ -144,6 +150,13 @@ public class Space {
         }
         return false;
 
+    }
+
+
+    private void debugOutput(String text){
+        if(debug){
+            System.out.println(this.spaceID + " " + text);
+        }
     }
 
 

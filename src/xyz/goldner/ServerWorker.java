@@ -93,14 +93,6 @@ public class ServerWorker implements Runnable {
                 if(array.length != 1){
                     debugOutput("ChipID "+ array[1] + " Temp " + array[0]);
 
-
-                    Random r = new Random();
-
-                    boolean random = r.nextBoolean();
-                    debugOutput("" + random);
-
-                    out.println(random==true?1:0);
-
                     temperature = Double.parseDouble(array[0]);
                 }else{
 
@@ -139,6 +131,7 @@ public class ServerWorker implements Runnable {
                 //sensor.setLocation(1);
                 debugOutput("New status " + sensor.getStatus());
                 if(sensor.getStatus() >0){ // if room is set, write to database
+                    int message = 0;
 
                     PreparedStatement preparedStatement = connection.prepareStatement(insertQuery);
 
@@ -148,6 +141,19 @@ public class ServerWorker implements Runnable {
                     preparedStatement.setDouble(3,temperature);
 
                     preparedStatement.execute();
+
+                    String isHeatingOnQuery = "select Prostor.grijanjeUpaljeno from Soba join Prostor on Soba.prostorID = Prostor.prostorID join Senzor on Senzor.sobaID = Soba.sobaID where Senzor.senzorID = ?";
+
+                    PreparedStatement ps = connection.prepareStatement(isHeatingOnQuery);
+                    ps.setInt(1, Integer.parseInt(array[1]));
+
+                    ResultSet rs = ps.executeQuery();
+
+                    while(rs.next()){
+                        message = rs.getInt(1);
+                    }
+
+                    out.println(message);
 
 
                 }
